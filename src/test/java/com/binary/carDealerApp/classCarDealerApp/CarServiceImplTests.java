@@ -135,6 +135,7 @@ public class CarServiceImplTests {
         updatedCar.setYear(2020);
         updatedCar.setPrice(75000.00);
 
+        Mockito.when(carRepository.findById(1L)).thenReturn(Optional.of(databaseCar));
         Mockito.when(carRepository.save(updatedCar)).thenReturn(updatedCar);
 
         Car result = carService.updateCar(updatedCar, 1L);
@@ -143,4 +144,27 @@ public class CarServiceImplTests {
         assertThat(result).isNotEqualTo(databaseCar);
         assertThat(result).isEqualTo(updatedCar);
     }
+
+    @Test
+    void CarServiceImpl_deleteCarById_ShouldSucceed() {
+        String regNum = UUID.randomUUID().toString();
+        Car databaseCar = new Car();
+        databaseCar.setId(1L);
+        databaseCar.setBrand("Ford");
+        databaseCar.setModel("Ranger");
+        databaseCar.setColor("Brown");
+        databaseCar.setImageUrl("randomUrl.net");
+        databaseCar.setRegNumber(regNum);
+        databaseCar.setYear(2014);
+        databaseCar.setPrice(35000.00);
+
+        Mockito.when(carRepository.findById(1L)).thenReturn(Optional.of(databaseCar));
+
+
+        carService.deleteCarById(1L);
+
+        Mockito.verify(carRepository, Mockito.times(1)).findById(1L);
+        Mockito.verify(carRepository, Mockito.times(1)).delete(databaseCar);
+    }
+
 }
