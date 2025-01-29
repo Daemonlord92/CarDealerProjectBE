@@ -21,7 +21,12 @@ public class CarServiceImpl implements CarService{
 
     @Override
     public Car createCar(Car car) {
-        if(car.getYear() < 1908) throw new IllegalArgumentException("Cars weren't invented till 1908 anything before is unknown");
+        if(car.getYear() < 1908) {
+            IllegalArgumentException exception =
+                    new IllegalArgumentException("Cars weren't invented till 1908 anything before is unknown");
+            System.out.println("Service throwing exception with message: " + exception.getMessage());
+            throw exception;
+        }
         return carRepository.save(car);
     }
 
