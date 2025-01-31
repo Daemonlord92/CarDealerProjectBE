@@ -1,6 +1,7 @@
 package com.binary.carDealerApp.classCarDealerApp.config;
 
 import com.binary.carDealerApp.classCarDealerApp.entities.UserCredential;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Service class for handling JWT (JSON Web Token) operations.
@@ -47,6 +49,28 @@ public class JwtService {
         return generateToken(claims, userCredential);
     }
 
+    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String extractUsername(String token) {
+        return extractClaims(token, Claims::getSubject);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaims(token, Claims::getExpiration);
+    }
+
+    public boolean isTokenValid(String token, UserCredential userCredential) {
+        final String username = extractUsername(token);
+        return (username.equalsIgnoreCase(userCredential.getUsername()) && !isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
     /**
      * Private method to generate a JWT with claims and user credentials.
      *
@@ -61,6 +85,15 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + jwtConfigProperty.getExpiration()))
                 .signWith(getSecretKey())
                 .compact();
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**

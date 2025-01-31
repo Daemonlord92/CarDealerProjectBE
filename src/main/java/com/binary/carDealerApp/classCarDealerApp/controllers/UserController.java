@@ -1,5 +1,6 @@
 package com.binary.carDealerApp.classCarDealerApp.controllers;
 
+import com.binary.carDealerApp.classCarDealerApp.dto.AuthorizationRequest;
 import com.binary.carDealerApp.classCarDealerApp.dto.PostNewUser;
 import com.binary.carDealerApp.classCarDealerApp.dto.UserDto;
 import com.binary.carDealerApp.classCarDealerApp.services.UserCredentialService;
@@ -46,5 +47,10 @@ public class UserController {
     public ResponseEntity<UserDto> postNewUser(@RequestBody PostNewUser postNewUser) {
         UserDto createdUser = userCredentialService.createUser(postNewUser);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody AuthorizationRequest request) {
+        return new ResponseEntity<>(userCredentialService.login(request), HttpStatus.OK);
     }
 }

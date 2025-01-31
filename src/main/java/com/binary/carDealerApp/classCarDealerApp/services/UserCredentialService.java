@@ -1,5 +1,6 @@
 package com.binary.carDealerApp.classCarDealerApp.services;
 
+import com.binary.carDealerApp.classCarDealerApp.dto.AuthorizationRequest;
 import com.binary.carDealerApp.classCarDealerApp.dto.PostNewUser;
 import com.binary.carDealerApp.classCarDealerApp.dto.UserDto;
 
@@ -30,6 +31,7 @@ public interface UserCredentialService {
      * - Mapping the created user entity to a UserDto for return
      */
     UserDto createUser(PostNewUser postNewUser);
+    String login(AuthorizationRequest request);
 
     // Potential future methods:
     // UserDto getUserById(String id);

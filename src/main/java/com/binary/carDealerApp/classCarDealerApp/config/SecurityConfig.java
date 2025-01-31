@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Configuration class for Spring Security.
@@ -33,6 +34,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private AuthenticationProvider authenticationProvider;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
      * Constructor for SecurityConfig.
@@ -40,8 +42,9 @@ public class SecurityConfig {
      *
      * @param authenticationProvider The provider responsible for authentication.
      */
-    public SecurityConfig(AuthenticationProvider authenticationProvider) {
+    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.authenticationProvider = authenticationProvider;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     /**
@@ -63,7 +66,7 @@ public class SecurityConfig {
                                     .requestMatchers(HttpMethod.GET,"/api/cars/all", "/api/dealers/all", "/api/cars/*", "/api/dealers/*")
                                     .permitAll()
                                     // Permits POST requests to create new users
-                                    .requestMatchers(HttpMethod.POST, "/api/users/")
+                                    .requestMatchers(HttpMethod.POST, "/api/users/", "/api/users/login")
                                     .permitAll()
                                     // Requires authentication for POST requests to create cars and dealers
                                     .requestMatchers(HttpMethod.POST,"/api/cars/", "/api/dealers/create")
@@ -80,7 +83,8 @@ public class SecurityConfig {
                 .sessionManagement(ses -> {
                     ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // Sets session policy to stateless
                 })
-                .authenticationProvider(authenticationProvider);  // Sets the authentication provider
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Sets the authentication provider
 
         return http.build();
     }

@@ -1,11 +1,15 @@
 package com.binary.carDealerApp.classCarDealerApp.services;
 
+import com.binary.carDealerApp.classCarDealerApp.config.JwtService;
+import com.binary.carDealerApp.classCarDealerApp.dto.AuthorizationRequest;
 import com.binary.carDealerApp.classCarDealerApp.dto.PostNewUser;
 import com.binary.carDealerApp.classCarDealerApp.dto.UserDto;
 import com.binary.carDealerApp.classCarDealerApp.entities.UserCredential;
 import com.binary.carDealerApp.classCarDealerApp.exception.InvalidRoleException;
 import com.binary.carDealerApp.classCarDealerApp.exception.UsernameTakenException;
 import com.binary.carDealerApp.classCarDealerApp.repositories.UserCredentialRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +31,8 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     private UserCredentialRepository userCredentialRepository;
     private PasswordEncoder passwordEncoder;
+    private AuthenticationManager authenticationManager;
+    private JwtService jwtService;
 
     /**
      * Constructor for dependency injection.
@@ -34,9 +40,16 @@ public class UserCredentialServiceImpl implements UserCredentialService {
      * @param userCredentialRepository Repository for user credential operations.
      * @param passwordEncoder Encoder for securely hashing passwords.
      */
-    public UserCredentialServiceImpl(UserCredentialRepository userCredentialRepository, PasswordEncoder passwordEncoder) {
+    public UserCredentialServiceImpl(
+            UserCredentialRepository userCredentialRepository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            JwtService jwtService
+    ) {
         this.userCredentialRepository = userCredentialRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -76,5 +89,15 @@ public class UserCredentialServiceImpl implements UserCredentialService {
         UserDto userDto = new UserDto(userCredential.getUsername(), userCredential.getRole());
 
         return userDto;
+    }
+
+    @Override
+    public String login(AuthorizationRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                request.username(),
+                request.password()
+        ));
+        String jwt = jwtService.generateToken(request.username());
+        return jwt;
     }
 }
