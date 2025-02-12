@@ -16,6 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 /**
  * Configuration class for Spring Security.
@@ -59,34 +63,47 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csfr -> csfr.disable())  // Disables CSRF protection
-                .cors(cors -> cors.disable())  // Disables CORS
+                .cors(cors -> cors.configurationSource(corFilter()))  // Disables CORS
                 .authorizeHttpRequests(ahr ->
                                 ahr
+                                        .anyRequest().permitAll()
                                     // Permits all GET requests to these endpoints
-                                    .requestMatchers(HttpMethod.GET,"/api/cars/all", "/api/dealers/all", "/api/cars/*", "/api/dealers/*")
-                                    .permitAll()
-                                    // Permits POST requests to create new users
-                                    .requestMatchers(HttpMethod.POST, "/api/users/", "/api/users/login")
-                                    .permitAll()
-                                    // Requires authentication for POST requests to create cars and dealers
-                                    .requestMatchers(HttpMethod.POST,"/api/cars/", "/api/dealers/create")
-                                    .authenticated()
-                                    // Requires DEALER or ADMIN role for PUT requests
-                                    .requestMatchers(HttpMethod.PUT, "/api/cars/*", "/api/dealers/update/*")
-                                    .hasAnyRole("DEALER", "ADMIN")
-                                    // Requires DEALER or ADMIN role for DELETE requests
-                                    .requestMatchers(HttpMethod.DELETE, "/api/cars/*", "/api/dealers/delete/*")
-                                    .hasAnyRole("DEALER", "ADMIN")
-                        )
+//                                    .requestMatchers(HttpMethod.GET,"/api/cars/all", "/api/dealers/all", "/api/cars/*", "/api/dealers/*")
+//                                    .permitAll()
+//                                    // Permits POST requests to create new users
+//                                    .requestMatchers(HttpMethod.POST, "/api/users/", "/api/users/login")
+//                                    .permitAll()
+//                                    // Requires authentication for POST requests to create cars and dealers
+//                                    .requestMatchers(HttpMethod.POST,"/api/cars/", "/api/dealers/create")
+//                                    .authenticated()
+//                                    // Requires DEALER or ADMIN role for PUT requests
+//                                    .requestMatchers(HttpMethod.PUT, "/api/cars/*", "/api/dealers/update/*")
+//                                    .hasAnyRole("DEALER", "ADMIN")
+//                                    // Requires DEALER or ADMIN role for DELETE requests
+//                                    .requestMatchers(HttpMethod.DELETE, "/api/cars/*", "/api/dealers/delete/*")
+//                                    .hasAnyRole("DEALER", "ADMIN")
+                        );
                 // Commented out: .httpBasic(Customizer.withDefaults());
                 // This line would enable HTTP Basic authentication if uncommented
-                .sessionManagement(ses -> {
-                    ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // Sets session policy to stateless
-                })
-                .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Sets the authentication provider
+//                .sessionManagement(ses -> {
+//                    ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // Sets session policy to stateless
+//                })
+//                .authenticationProvider(authenticationProvider)
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Sets the authentication provider
 
         return http.build();
+    }
+
+    @Bean
+    public UrlBasedCorsConfigurationSource corFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(false);
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     /**
