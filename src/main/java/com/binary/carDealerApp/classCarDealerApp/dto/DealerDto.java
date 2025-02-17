@@ -1,5 +1,7 @@
 package com.binary.carDealerApp.classCarDealerApp.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Data Transfer Object (DTO) for Dealer information.
  * This class is used to transfer dealer data between different layers of the application,
@@ -11,7 +13,7 @@ package com.binary.carDealerApp.classCarDealerApp.dto;
  * 3. Includes a custom toString() method for easy debugging and logging.
  */
 public class DealerDto {
-
+    @JsonProperty("dealerName")
     private String name;
 
     /**
