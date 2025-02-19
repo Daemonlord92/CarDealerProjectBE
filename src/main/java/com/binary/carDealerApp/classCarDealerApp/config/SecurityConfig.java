@@ -66,30 +66,30 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corFilter()))  // Disables CORS
                 .authorizeHttpRequests(ahr ->
                                 ahr
-                                        .anyRequest().permitAll()
+                                        //.anyRequest().permitAll()
                                     // Permits all GET requests to these endpoints
-//                                    .requestMatchers(HttpMethod.GET,"/api/cars/all", "/api/dealers/all", "/api/cars/*", "/api/dealers/*")
-//                                    .permitAll()
-//                                    // Permits POST requests to create new users
-//                                    .requestMatchers(HttpMethod.POST, "/api/users/", "/api/users/login")
-//                                    .permitAll()
-//                                    // Requires authentication for POST requests to create cars and dealers
-//                                    .requestMatchers(HttpMethod.POST,"/api/cars/", "/api/dealers/create")
-//                                    .authenticated()
-//                                    // Requires DEALER or ADMIN role for PUT requests
-//                                    .requestMatchers(HttpMethod.PUT, "/api/cars/*", "/api/dealers/update/*")
-//                                    .hasAnyRole("DEALER", "ADMIN")
-//                                    // Requires DEALER or ADMIN role for DELETE requests
-//                                    .requestMatchers(HttpMethod.DELETE, "/api/cars/*", "/api/dealers/delete/*")
-//                                    .hasAnyRole("DEALER", "ADMIN")
-                        );
+                                    .requestMatchers(HttpMethod.GET,"/api/cars/all", "/api/dealers/all", "/api/cars/*", "/api/dealers/*")
+                                    .permitAll()
+                                    // Permits POST requests to create new users
+                                    .requestMatchers(HttpMethod.POST, "/api/users/", "/api/users/login")
+                                    .permitAll()
+                                    // Requires authentication for POST requests to create cars and dealers
+                                    .requestMatchers(HttpMethod.POST,"/api/cars/", "/api/dealers/create")
+                                    .authenticated()
+                                    // Requires DEALER or ADMIN role for PUT requests
+                                    .requestMatchers(HttpMethod.PUT, "/api/cars/*", "/api/dealers/update/*")
+                                    .hasAnyRole("DEALER", "ADMIN")
+                                    // Requires DEALER or ADMIN role for DELETE requests
+                                    .requestMatchers(HttpMethod.DELETE, "/api/cars/*", "/api/dealers/delete/*")
+                                    .hasAnyRole("DEALER", "ADMIN")
+                        )
                 // Commented out: .httpBasic(Customizer.withDefaults());
                 // This line would enable HTTP Basic authentication if uncommented
-//                .sessionManagement(ses -> {
-//                    ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // Sets session policy to stateless
-//                })
-//                .authenticationProvider(authenticationProvider)
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Sets the authentication provider
+                .sessionManagement(ses -> {
+                    ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS);  // Sets session policy to stateless
+                })
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Sets the authentication provider
 
         return http.build();
     }
